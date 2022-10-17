@@ -1,0 +1,90 @@
+\section{Http 首部}
+\subsection{通用首部字段}
+
+HTTP 通用首部字段包括如下内容:
+
+\begin{table}[H]
+    \centering
+    \caption{通用首部字段}
+    \label{table:通用首部字段}
+    \setlength{\tabcolsep}{4mm}
+    \begin{tabular}{l|l}
+        \toprule
+        \textbf{字段名} & \textbf{说明} \\
+        \midrule
+        Cache-Control & 控制缓存行为 \\
+        Connection & 逐跳首部，连接的管理 \\
+        Date & 时间日期 \\
+        Pragma & 报文指令(为兼容 http1 而存在) \\
+        Trailer & 报文末端的首部一览 \\
+        Transfer-Encoding & 指定报文主体的传输编码方式 \\
+        Upgrade & 升级为其他协议 \\
+        Via & 代理服务器相关信息 \\
+        Warning & 错误信息 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsubsection{Cache-Control}
+
+\begin{bash}
+Cache-Control: private, max-age=0, no-cache
+\end{bash}
+
+按请求和响应分类如下:
+
+\begin{table}[H]
+    \centering
+    \caption{缓存请求指令}
+    \label{table:缓存请求指令}
+    \setlength{\tabcolsep}{4mm}
+    \begin{tabular}{l|l|l}
+        \toprule
+        \textbf{指令} & \textbf{参数} & \textbf{说明} \\
+        \midrule
+        no-cache & - & 强制向源服务器再次验证 \\
+        no-store & - & 不缓存请求或响应的任何内容 \\
+        max-age = [秒] & 必须 & 响应的最大 Age 值 \\
+        max-stale(=[秒]) & 可省略 & 接收已过期的响应 \\
+        min-fresh = [秒] & 必须 & 期望在指定时间内的响应仍有效 \\
+        no-transform & - & 代理不可更换媒体类型 \\
+        only-if-cached & - & 从缓存获取资源 \\
+        cache-extension & - & 新指令标记(token) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{缓存响应指令}
+    \label{table:缓存响应指令}
+    \setlength{\tabcolsep}{4mm}
+    \begin{tabular}{l|l|l}
+        \toprule
+        \textbf{指令} & \textbf{参数} & \textbf{说明} \\
+        \midrule
+        public & - & 向任意方提供响应的缓存 \\
+        private & 可省略 & 仅向特定用户返回响应 \\
+        no-cache & 可省略 & 缓存前必须先确认其有效性 \\
+        no-store & - & 不缓存请求或响应的任何内容 \\
+        no-transform & - & 代理不可更改媒体类型 \\
+        must-revalidate & - & 可缓存但必须再向源服务器及逆行确认 \\
+        proxy-revalidate & - & 要求中间缓存服务器对缓存的响应有效性再进行确认 \\
+        max-age & 必需 & 响应的最大 Age 值 \\
+        s-maxage & 必需 & 公共缓存服务器响应的最大 Age 值 \\
+        cache-extension & - & 新指令标记(token) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph*{no-cache} 使用 no-cache 指令的目的是为了防止从缓存中返回过期的资源。
+
+客户端发送的请求中如果包含 no-cache 指令，则表示客户端将不会接收缓存过的响应。于是，“中间”的缓存服务器必须把客户端请求转发给源服务器。
+
+如果服务器返回的响应中包含 no-cache 指令，那么缓存服务器不能对资源进行缓存。源服务器以后也将不再对缓存服务器请求中提出的资源有效性进行确认，且禁止其对响应资源进行缓存操作。
+
+由服务器返回的响应中，若报文首部字段 Cache-Control 中对 no-cache 字段名具体指定参数值，那么客户端在接收到这个被指定参数值的首部字段对应的响应报文后，就不能使用缓存。换言之，无参数值的首部字段可以使用缓存。只能在响应指令中指定该参数。
+
+\begin{bash}
+Cache-Control: no-cache=Location
+\end{bash}
